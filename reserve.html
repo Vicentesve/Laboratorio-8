@@ -60,7 +60,7 @@
                 <label for="reserve-unique-id">Unique ID</label>
                 <input type="text" class="form-control" id="reserve-unique-id">
               </div>
-              <button type="submit" class="btn btn-primary submit">Submit</button>
+              <button type="submit" id="add-btn" class="btn btn-primary submit">Submit</button>
             </form>
           </div>
         </div>
@@ -84,6 +84,62 @@
 
 <!-- BELOW CODE IS CRITICAL. IT HANDLES HOW FORM DATA IS SENT TO OUR SERVER -->
 <script type="text/javascript">
+  $("#add-btn").on("click", function(event) {
+    event.preventDefault();
 
+    if($("#reserve-name").val().trim() == "") {
+      alert("Please, enter the name");
+      return;
+    }
+    if($("#reserve-phone").val().trim() == "") {
+      alert("Please, enter the phone number");
+      return;
+    }
+    if($("#reserve-email").val().trim() == "") {
+      alert("Please, enter the email");
+      return;
+    }
+    if($("#reserve-unique-id").val().trim() == "") {
+      alert("Please, enter the unique id");
+      return;
+    }
+
+    $.get("api/tables", function(tables) {
+      
+      var newTable = {
+        id: $("#reserve-unique-id").val().trim(),
+        name: $("#reserve-name").val().trim(),
+        email: $("#reserve-email").val().trim().trim(),
+        phone: $("#reserve-phone").val().trim()
+      };
+
+      if (tables.length < 5) {
+        
+        $.post("/api/tables", newTable)
+          .then(function(newTable) {
+          console.log(newTable);
+          alert("Yay! You are officially booked!");
+
+          $("#reserve-unique-id").val("");
+          $("#reserve-name").val("");
+          $("#reserve-email").val("");
+          $("#reserve-phone").val("");
+        });
+  
+      } else {
+        $.post("/api/waitlist", newTable)
+          .then(function(newTable) {
+          console.log(newTable);
+          alert("Sorry you are on the wait list");
+
+          $("#reserve-unique-id").val("");
+          $("#reserve-name").val("");
+          $("#reserve-email").val("");
+          $("#reserve-phone").val("");
+        });
+      }
+
+    });
+  });
 
 </script>
